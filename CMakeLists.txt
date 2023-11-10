@@ -36,6 +36,8 @@ find_package(CUDA REQUIRED)
 
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
+# find_package(GLEW REQUIRED)
+
 # cu_sphere
 add_library(cu_sphere
   src/cu_sphere.cu

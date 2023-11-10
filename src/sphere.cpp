@@ -137,9 +137,37 @@ Eigen::MatrixXf random_sphere_points(int num_points, unsigned long seed) {
   }
 }
 
+std::pair<Eigen::MatrixXd, Eigen::MatrixXi>
+random_tri_sphere(int num_points, uint32_t seed) {
+  auto m = random_sphere_points(num_points, seed);
+
+  std::vector<Point_3> points;
+  for (int i = 0; i < num_points; i++) {
+    points.push_back(Point_3{m(i, 0), m(i, 1), m(i, 2)});
+  }
+
+  Mesh hull;
+  CGAL::convex_hull_3(points.begin(), points.end(), hull);
+
+  for (auto face : hull.faces()) {
+    auto h = hull.halfedge(face);
+
+    // check face orientation
+    auto p1 = hull.point(hull.target(h));
+    auto p2 = hull.point(hull.target(hull.next(h)));
+    auto p3 = hull.point(hull.target(hull.next(hull.next(h))));
+    CHECK(CGAL::orientation(p1, p2, p3, Point_3{0., 0., 0.}) == CGAL::NEGATIVE);
+
+    auto nv =
+        boost::size(CGAL::vertices_around_face(hull.halfedge(face), hull));
+    CHECK(nv == 3);
+  }
+
+  return cgal_to_igl_mesh(hull);
+}
 
 std::pair<std::vector<Point_3>, Mesh>
-random_tri_sphere(int numPoints, int numRelaxations, uint32_t seed) {
+random_tri_sphere_cgal(int numPoints, int numRelaxations, uint32_t seed) {
   // auto rand = CGAL::Random(seed);
   // auto g = CGAL::Random_points_on_sphere_3<Point_3>(1., rand);
 
