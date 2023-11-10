@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cgal.hpp"
-#include <igl/polygons_to_triangles.h>
 
 namespace edf {
 
